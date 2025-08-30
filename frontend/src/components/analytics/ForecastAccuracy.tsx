@@ -8,7 +8,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine
+  ReferenceLine,
+  Area,
+  ComposedChart
 } from 'recharts';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
@@ -86,7 +88,7 @@ const ForecastAccuracy: React.FC<ForecastAccuracyProps> = ({
 
       <div className="h-64 mb-4">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <ComposedChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#7B29B8" opacity={0.2} />
             <XAxis 
               dataKey="date" 
@@ -100,6 +102,15 @@ const ForecastAccuracy: React.FC<ForecastAccuracyProps> = ({
             />
             <Tooltip content={<CustomTooltip />} />
             <ReferenceLine y={80} stroke="#C129A0" strokeDasharray="5 5" />
+            
+            {/* Add confidence area */}
+            <Area
+              dataKey="accuracy"
+              stroke="none"
+              fill="#7B29B8"
+              fillOpacity={0.1}
+            />
+            
             <Line
               type="monotone"
               dataKey="accuracy"
@@ -108,7 +119,7 @@ const ForecastAccuracy: React.FC<ForecastAccuracyProps> = ({
               dot={{ fill: '#7B29B8', strokeWidth: 2, r: 5 }}
               activeDot={{ r: 7, stroke: '#7B29B8', strokeWidth: 2, fill: '#FFFFFF' }}
             />
-          </LineChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
 
@@ -131,6 +142,12 @@ const ForecastAccuracy: React.FC<ForecastAccuracyProps> = ({
             {Math.min(...chartData.map(d => d.accuracy)).toFixed(1)}%
           </p>
         </div>
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-quantum-ember/20">
+        <button className="text-quantum-ember text-sm font-medium hover:text-quantum-ember/80 transition-colors">
+          View detailed accuracy analysis →
+        </button>
       </div>
     </Card>
   );

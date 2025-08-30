@@ -3,16 +3,22 @@ import { motion } from 'framer-motion';
 import {
   GlobeAltIcon,
   MagnifyingGlassIcon,
-  FunnelIcon
+  FunnelIcon,
+  PlusIcon,
+  PencilIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
 import Header from '../components/navigation/Header';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
 import Badge from '../components/ui/Badge';
+import StatCard from '../components/ui/StatCard';
+import ProgressBar from '../components/ui/ProgressBar';
+import SearchInput from '../components/ui/SearchInput';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import CountryForm from '../components/forms/CountryForm';
 import { useCountries } from '../hooks/useData';
+import { formatNumber, formatDate } from '../lib/utils';
 
 const Countries: React.FC = () => {
   const { countries, loading, error } = useCountries();
@@ -60,6 +66,8 @@ const Countries: React.FC = () => {
   });
 
   const regions = Array.from(new Set(countries.map(c => c.region).filter(Boolean)));
+  const totalIndicators = countries.reduce((sum, c) => sum + c.totalIndicators, 0);
+  const avgAccuracy = countries.reduce((sum, c) => sum + c.forecastAccuracy, 0) / countries.length;
 
   return (
     <div className="space-y-6">
@@ -69,15 +77,51 @@ const Countries: React.FC = () => {
       />
 
       <div className="p-6 space-y-6">
+        {/* Overview Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <StatCard
+            title="Total Countries"
+            value={countries.length}
+            icon={<GlobeAltIcon />}
+            color="quantum-ember"
+            trend={{
+              value: 2.3,
+              label: 'vs last month',
+              direction: 'up'
+            }}
+          />
+          <StatCard
+            title="Active Regions"
+            value={regions.length}
+            icon={<GlobeAltIcon />}
+            color="stabilizer-cyan"
+          />
+          <StatCard
+            title="Total Indicators"
+            value={totalIndicators}
+            icon={<GlobeAltIcon />}
+            color="radiant-magenta"
+          />
+          <StatCard
+            title="Avg Accuracy"
+            value={`${formatNumber(avgAccuracy, 1)}%`}
+            icon={<GlobeAltIcon />}
+            color="green"
+            trend={{
+              value: 1.2,
+              label: 'improvement',
+              direction: 'up'
+            }}
+          />
+        </div>
+
         {/* Filters */}
         <Card>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <Input
+              <SearchInput
                 placeholder="Search countries..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                icon={<MagnifyingGlassIcon className="w-4 h-4" />}
+                onSearch={setSearchQuery}
               />
             </div>
             <div className="flex gap-2">
@@ -96,7 +140,7 @@ const Countries: React.FC = () => {
               </Button>
               <Button 
                 variant="primary" 
-                icon={<GlobeAltIcon className="w-4 h-4" />}
+                icon={<PlusIcon className="w-4 h-4" />}
                 onClick={handleAddCountry}
               >
                 Add Country
@@ -142,17 +186,24 @@ const Countries: React.FC = () => {
                     </span>
                   </div>
                   
-                  <div className="flex justify-between items-center">
-                    <span className="text-text-secondary text-sm">Forecast Accuracy</span>
-                    <span className="text-text-primary font-medium">
-                      {country.forecastAccuracy.toFixed(1)}%
-                    </span>
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-text-secondary text-sm">Forecast Accuracy</span>
+                      <span className="text-text-primary font-medium">
+                        {formatNumber(country.forecastAccuracy, 1)}%
+                      </span>
+                    </div>
+                    <ProgressBar 
+                      value={country.forecastAccuracy} 
+                      size="sm" 
+                      animated={false}
+                    />
                   </div>
 
                   <div className="flex justify-between items-center">
                     <span className="text-text-secondary text-sm">Last Updated</span>
                     <span className="text-text-primary font-medium text-xs">
-                      {new Date(country.lastUpdated).toLocaleDateString()}
+                      {formatDate(country.lastUpdated)}
                     </span>
                   </div>
                 </div>
@@ -160,18 +211,21 @@ const Countries: React.FC = () => {
                 <div className="mt-4 pt-4 border-t border-quantum-ember/20">
                   <div className="flex space-x-2">
                     <Button 
-                      variant="ghost" 
+                      variant="secondary" 
                       size="sm" 
-                      className="flex-1"
+                      icon={<PencilIcon className="w-3 h-3" />}
                       onClick={() => handleEditCountry(country)}
                     >
                       Edit
                     </Button>
-                    <Button variant="ghost" size="sm" className="flex-1">
-                      View Details
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      icon={<EyeIcon className="w-3 h-3" />}
+                    >
+                      Details
                     </Button>
                   </div>
-                    View Details
                 </div>
               </Card>
             </motion.div>
@@ -182,6 +236,14 @@ const Countries: React.FC = () => {
           <div className="text-center py-12">
             <GlobeAltIcon className="w-12 h-12 text-text-secondary mx-auto mb-4" />
             <p className="text-text-secondary">No countries found matching your criteria</p>
+            <Button 
+              variant="primary" 
+              className="mt-4"
+              icon={<PlusIcon className="w-4 h-4" />}
+              onClick={handleAddCountry}
+            >
+              Add Your First Country
+            </Button>
           </div>
         )}
       </div>

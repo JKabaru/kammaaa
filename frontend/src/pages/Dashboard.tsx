@@ -8,17 +8,21 @@ import QuickActions from '../components/dashboard/QuickActions';
 import DataQualityIndicator from '../components/dashboard/DataQualityIndicator';
 import PerformanceMetrics from '../components/analytics/PerformanceMetrics';
 import DataCoverage from '../components/analytics/DataCoverage';
+import GlobalSentimentCard from '../components/dashboard/GlobalSentimentCard';
+import CountryOverview from '../components/dashboard/CountryOverview';
+import ForecastSummary from '../components/dashboard/ForecastSummary';
 import ForecastChart from '../components/charts/ForecastChart';
 import CategoryDistributionChart from '../components/charts/CategoryDistributionChart';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { useDashboardMetrics, useForecasts } from '../hooks/useData';
+import { useDashboardMetrics, useForecasts, useCountries } from '../hooks/useData';
 import type { ChartDataPoint, CategoryMetrics } from '../types';
 
 const Dashboard: React.FC = () => {
   const { metrics, loading: metricsLoading } = useDashboardMetrics();
   const { forecasts, loading: forecastsLoading } = useForecasts();
+  const { countries, loading: countriesLoading } = useCountries();
 
-  if (metricsLoading || forecastsLoading) {
+  if (metricsLoading || forecastsLoading || countriesLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <LoadingSpinner size="lg" />
@@ -63,12 +67,21 @@ const Dashboard: React.FC = () => {
         {/* Metrics Grid */}
         <MetricsGrid metrics={metrics} />
 
+        {/* Global Sentiment */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <GlobalSentimentCard />
+        </motion.div>
+
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Charts Section */}
-          <div className="xl:col-span-4 space-y-6">
+          <div className="xl:col-span-3 space-y-6">
             {/* Top Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -95,24 +108,16 @@ const Dashboard: React.FC = () => {
                   />
                 </div>
               </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-              >
-                <DataQualityIndicator overallScore={metrics.dataQuality} />
-              </motion.div>
             </div>
 
-            {/* Performance Metrics */}
+            {/* Country Overview and Forecast Summary */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <PerformanceMetrics />
+                <CountryOverview countries={countries} />
               </motion.div>
 
               <motion.div
@@ -120,13 +125,21 @@ const Dashboard: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45 }}
               >
-                <DataCoverage />
+                <ForecastSummary forecasts={forecasts} />
               </motion.div>
             </div>
           </div>
 
           {/* Sidebar */}
           <div className="xl:col-span-1 space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.35 }}
+            >
+              <DataQualityIndicator overallScore={metrics.dataQuality} />
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -146,14 +159,26 @@ const Dashboard: React.FC = () => {
               <RecentActivity />
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7 }}
-            >
-              <QuickActions />
-            </motion.div>
           </div>
+        </div>
+
+        {/* Bottom Section - Performance and Actions */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            <PerformanceMetrics />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75 }}
+          >
+            <QuickActions />
+          </motion.div>
         </div>
       </div>
     </div>

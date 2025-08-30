@@ -60,3 +60,55 @@ export function debounce<T extends (...args: any[]) => any>(
 export function generateId(): string {
   return Math.random().toString(36).substr(2, 9);
 }
+
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
+}
+
+export function capitalizeFirst(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function getStatusColor(status: string): string {
+  switch (status.toLowerCase()) {
+    case 'success':
+    case 'active':
+    case 'healthy':
+      return 'text-green-400';
+    case 'warning':
+    case 'pending':
+      return 'text-yellow-400';
+    case 'error':
+    case 'failed':
+    case 'inactive':
+      return 'text-red-400';
+    case 'info':
+    case 'processing':
+      return 'text-stabilizer-cyan';
+    default:
+      return 'text-text-secondary';
+  }
+}
+
+export function sortByKey<T>(array: T[], key: keyof T, direction: 'asc' | 'desc' = 'asc'): T[] {
+  return [...array].sort((a, b) => {
+    const aValue = a[key];
+    const bValue = b[key];
+    
+    if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
+  return array.reduce((groups, item) => {
+    const groupKey = String(item[key]);
+    if (!groups[groupKey]) {
+      groups[groupKey] = [];
+    }
+    groups[groupKey].push(item);
+    return groups;
+  }, {} as Record<string, T[]>);
+}
