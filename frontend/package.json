@@ -19,6 +19,7 @@
     "@mui/material": "^7.3.1",
     "@supabase/supabase-js": "^2.45.4",
     "chart.js": "^4.5.0",
+    "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.542.0",
@@ -28,6 +29,7 @@
     "react-hook-form": "^7.62.0",
     "react-router-dom": "^6.26.2",
     "recharts": "^3.1.2",
+    "tailwind-merge": "^3.3.1",
     "yup": "^1.7.0"
   },
   "devDependencies": {
